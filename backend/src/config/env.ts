@@ -24,6 +24,7 @@ const envSchema = z.object({
     AWS_REGION: z.string().min(1, 'AWS_REGION is required'),
     AWS_S3_BUCKET_NAME: z.string().min(1, 'AWS_S3_BUCKET_NAME is required'),
     CLAUDE_API_URL: z.string().min(1, 'CLAUDE_API_URL is required'),
+    CLAUDE_API_KEY: z.string().min(1, 'CLAUDE_API_KEY is required'),
     LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
     LOG_FILE_PATH: z.string().default('logs/app.log'),
     CORS_ORIGIN: z.string().default('http://localhost:3000'),
