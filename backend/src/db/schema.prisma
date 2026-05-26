@@ -1,0 +1,35 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum EmploymentType {
+  PERMANENT
+  CONTRACT
+}
+
+enum WorkMode{
+    REMOTE
+    ONSITE
+    HYBRID
+}
+
+enum JobStatus{
+    ACTIVE
+    EXPIRED
+}
+
+enum NotificationType{
+    EMAIL
+    IN_APP
+    WHATSAPP
+}
+
+enum ResumeStatus{
+    ACTIVE
+    OUTDATED
+}
