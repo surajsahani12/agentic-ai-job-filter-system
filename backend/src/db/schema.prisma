@@ -42,6 +42,12 @@ model User {
   refresh_token String?
   is_active     Boolean   @default(true)
   last_login    DateTime?
+  preferences   UserPreferences?
+  skills        UserSkill[]
+  jobMatches    UserJobMatch[]
+  categories    JobCategory[]
+  resumes       Resume[]
+  notifications Notification[]
   created_at    DateTime  @default(now())
   updated_at    DateTime  @updatedAt
 }
@@ -81,6 +87,7 @@ model Job{
     external_job_id     String         
     source              String
     title               String
+    company             String?
     job_description     String?
     job_type            EmploymentType?
     work_mode           WorkMode?
@@ -88,9 +95,78 @@ model Job{
     location            String?
     posted_at           DateTime?
     scraped_at          DateTime?
-    job_status          JobStatus
+    job_status          JobStatus   @default(ACTIVE)
     job_link            String?
+    userMatches         UserJobMatch[]
+    categoryMatches     JobCategoryMatch[]
     created_at       DateTime        @default(now())
     updated_at       DateTime        @updatedAt
     @@unique([external_job_id, source])
+}
+
+model UserJobMatch {
+    id                  Int         @id @default(autoincrement())
+    user                User        @relation(fields:[user_id], references:[id], onDelete:  Cascade)
+    user_id             Int
+    job                 Job         @relation(fields:[job_id], references:[id], onDelete:  Cascade)
+    job_id              Int
+    is_notified         Boolean     @default(false)
+    is_seen             Boolean     @default(false)
+    is_applied          Boolean     @default(false)
+    matched_at          DateTime    @default(now()) 
+    created_at       DateTime       @default(now())
+    updated_at       DateTime       @updatedAt
+
+    @@unique([user_id, job_id])
+}
+
+model JobCategory{
+    id                  Int         @id @default(autoincrement())
+    user                User        @relation(fields:[user_id], references:[id], onDelete:  Cascade)
+    user_id             Int
+    category_name       String
+    jobMatches          JobCategoryMatch[]
+    resumes             Resume[]
+    created_at       DateTime       @default(now())
+    updated_at       DateTime       @updatedAt
+}
+
+model JobCategoryMatch{
+    id                  Int                 @id @default(autoincrement())
+    job                 Job                 @relation(fields:[job_id], references:[id], onDelete:  Cascade)
+    job_id              Int
+    job_category        JobCategory         @relation(fields:[job_category_id], references:[id], onDelete:  Cascade)
+    job_category_id         Int
+    @@unique([job_id, job_category_id])
+}
+
+model Resume{
+    id                  Int                 @id @default(autoincrement())
+    user                User                @relation(fields:[user_id], references:[id], onDelete:  Cascade)
+    user_id             Int
+    job_category        JobCategory         @relation(fields:[job_category_id], references:[id], onDelete:  Cascade)
+    job_category_id         Int
+    resume_url          String
+    version             Int                 @default(1)
+    status              ResumeStatus        @default(ACTIVE)
+    created_at       DateTime               @default(now())
+    updated_at       DateTime               @updatedAt
+
+    @@index([user_id, status])
+}
+
+model Notification {
+    id                  Int                 @id @default(autoincrement())
+    user                User                @relation(fields:[user_id], references:[id], onDelete:  Cascade)
+    user_id             Int
+    title               String?
+    message             String?
+    type                NotificationType?
+    is_delivered        Boolean             @default(false)
+    error_message       String?        
+    sent_at             DateTime?
+    created_at          DateTime               @default(now())
+    updated_at          DateTime               @updatedAt
+
+    @@index([user_id, is_delivered])
 }

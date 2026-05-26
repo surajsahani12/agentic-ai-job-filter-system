@@ -4,6 +4,9 @@
   "description": "Job automation system - scrapes jobs, tailors resumes using Claude AI",
   "main": "dist/index.js",
   "type": "module",
+  "prisma": {
+    "schema": "src/db/schema.prisma"
+  },
   "scripts": {
     "dev": "nodemon --watch src --ext ts --exec ts-node src/index.ts",
     "build": "tsc",
