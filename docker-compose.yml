@@ -2,7 +2,10 @@ services:
   postgres:
     image: postgres:17-alpine
     container_name: job_automation_db
-    environment: POSTGRES_USER= POSTGRES_PASSWORD= POSTGRES_DB=
+    environment:
+      POSTGRES_USER: suraj
+      POSTGRES_PASSWORD: surajsahani
+      POSTGRES_DB: job_automation_db
     ports:
       - "5432:5432"
     volumes:

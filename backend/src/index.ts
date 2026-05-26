@@ -1,7 +1,7 @@
 import { env } from './config/env'
 import prisma from './config/db'
 import redis from './config/redis'
-import express from 'express';
+import express from 'express'
 
 const app = express();
 app.use(express.json());
