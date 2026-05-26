@@ -1,0 +1,172 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum EmploymentType {
+  PERMANENT
+  CONTRACT
+}
+
+enum WorkMode{
+    REMOTE
+    ONSITE
+    HYBRID
+}
+
+enum JobStatus{
+    ACTIVE
+    EXPIRED
+}
+
+enum NotificationType{
+    EMAIL
+    IN_APP
+    WHATSAPP
+}
+
+enum ResumeStatus{
+    ACTIVE
+    OUTDATED
+}
+
+model User {
+  id            Int       @id @default(autoincrement())
+  full_name     String
+  email         String    @unique
+  password_hash String
+  refresh_token String?
+  is_active     Boolean   @default(true)
+  last_login    DateTime?
+  preferences   UserPreferences?
+  skills        UserSkill[]
+  jobMatches    UserJobMatch[]
+  categories    JobCategory[]
+  resumes       Resume[]
+  notifications Notification[]
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+}
+
+model UserPreferences {
+  id               Int             @id @default(autoincrement())
+  user             User            @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id          Int             @unique
+  job_role         String
+  experience_years Int?
+  location         String?
+  min_salary       Int?
+  employment_type  EmploymentType?
+  work_mode        WorkMode?
+  notice_period    String?
+  created_at       DateTime        @default(now())
+  updated_at       DateTime        @updatedAt
+}
+
+model Skill {
+  id         Int         @id @default(autoincrement())
+  name       String      @unique
+  userSkills UserSkill[]
+}
+
+model UserSkill {
+  user     User  @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id  Int
+  skill    Skill @relation(fields: [skill_id], references: [id], onDelete: Cascade)
+  skill_id Int
+
+  @@id([user_id, skill_id])
+}
+
+model Job{
+    id                  Int         @id @default(autoincrement())
+    external_job_id     String         
+    source              String
+    title               String
+    company             String?
+    job_description     String?
+    job_type            EmploymentType?
+    work_mode           WorkMode?
+    salary_offered      String?
+    location            String?
+    posted_at           DateTime?
+    scraped_at          DateTime?
+    job_status          JobStatus   @default(ACTIVE)
+    job_link            String?
+    userMatches         UserJobMatch[]
+    categoryMatches     JobCategoryMatch[]
+    created_at       DateTime        @default(now())
+    updated_at       DateTime        @updatedAt
+    @@unique([external_job_id, source])
+}
+
+model UserJobMatch {
+    id                  Int         @id @default(autoincrement())
+    user                User        @relation(fields:[user_id], references:[id], onDelete:  Cascade)
+    user_id             Int
+    job                 Job         @relation(fields:[job_id], references:[id], onDelete:  Cascade)
+    job_id              Int
+    is_notified         Boolean     @default(false)
+    is_seen             Boolean     @default(false)
+    is_applied          Boolean     @default(false)
+    matched_at          DateTime    @default(now()) 
+    created_at       DateTime       @default(now())
+    updated_at       DateTime       @updatedAt
+
+    @@unique([user_id, job_id])
+}
+
+model JobCategory{
+    id                  Int         @id @default(autoincrement())
+    user                User        @relation(fields:[user_id], references:[id], onDelete:  Cascade)
+    user_id             Int
+    category_name       String
+    jobMatches          JobCategoryMatch[]
+    resumes             Resume[]
+    created_at       DateTime       @default(now())
+    updated_at       DateTime       @updatedAt
+}
+
+model JobCategoryMatch{
+    id                  Int                 @id @default(autoincrement())
+    job                 Job                 @relation(fields:[job_id], references:[id], onDelete:  Cascade)
+    job_id              Int
+    job_category        JobCategory         @relation(fields:[job_category_id], references:[id], onDelete:  Cascade)
+    job_category_id         Int
+    @@unique([job_id, job_category_id])
+}
+
+model Resume{
+    id                  Int                 @id @default(autoincrement())
+    user                User                @relation(fields:[user_id], references:[id], onDelete:  Cascade)
+    user_id             Int
+    job_category        JobCategory         @relation(fields:[job_category_id], references:[id], onDelete:  Cascade)
+    job_category_id         Int
+    resume_url          String
+    version             Int                 @default(1)
+    status              ResumeStatus        @default(ACTIVE)
+    created_at       DateTime               @default(now())
+    updated_at       DateTime               @updatedAt
+
+    @@index([user_id, status])
+}
+
+model Notification {
+    id                  Int                 @id @default(autoincrement())
+    user                User                @relation(fields:[user_id], references:[id], onDelete:  Cascade)
+    user_id             Int
+    title               String?
+    message             String?
+    type                NotificationType?
+    is_delivered        Boolean             @default(false)
+    error_message       String?        
+    sent_at             DateTime?
+    created_at          DateTime               @default(now())
+    updated_at          DateTime               @updatedAt
+
+    @@index([user_id, is_delivered])
+}
