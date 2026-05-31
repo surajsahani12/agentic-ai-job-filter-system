@@ -2,9 +2,18 @@ import { env } from './config/env'
 import prisma from './config/db'
 import redis from './config/redis'
 import express from 'express'
-
+import cookieParser from 'cookie-parser'
+import { errorHandler } from './api/middleware/error.middleware'
+import authRoutes from './api/routes/auth.routes'
 const app = express();
 app.use(express.json());
+app.use(cookieParser())
+
+// ============ ROUTES GO HERE ============
+app.use('/api/v1/auth', authRoutes)
+
+app.use(errorHandler)
+
 
 const bootStrap = async () => {
     await prisma.$connect()
