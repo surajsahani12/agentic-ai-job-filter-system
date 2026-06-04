@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import * as authService from "../../services/auth.service";
 import { env } from "../../config/env"
 import { UnauthorizedError } from "../../types/errors.types";
+import { AuthenticatedRequest } from "../../types/express.types";
 
 export const register = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -44,7 +45,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 
 export const logout = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const user_id = (req as any).user.user_id
+        const user_id = (req as AuthenticatedRequest).user.user_id
         await authService.logoutUser(user_id)
         res.clearCookie('refresh_token')
         res.status(204).send()
