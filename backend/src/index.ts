@@ -5,12 +5,14 @@ import express from 'express'
 import cookieParser from 'cookie-parser'
 import { errorHandler } from './api/middleware/error.middleware'
 import authRoutes from './api/routes/auth.routes'
+import userRoutes from './api/routes/user.routes'
 const app = express();
 app.use(express.json());
 app.use(cookieParser())
 
 // ============ ROUTES GO HERE ============
 app.use('/api/v1/auth', authRoutes)
+app.use('/api/v1/user', userRoutes)
 
 app.use(errorHandler)
 
