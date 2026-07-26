@@ -13,6 +13,8 @@ export const findUserById = async (id: number) => {
     return await prisma.user.findUnique({ where: { id } })
 }
 
+
+
 export const updateUser = async (id: number, data: Prisma.UserUpdateInput) => {
     return await prisma.user.update({ where: { id }, data })
 }

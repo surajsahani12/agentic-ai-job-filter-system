@@ -38,6 +38,8 @@ export const getPreferences = async (userId: number) => {
     return preferences;
 }
 
+
+
 export const updatePreferences = async (userId: number, data: Prisma.UserPreferencesUpdateInput) => {
     const updatedPreferences = await upsertPreferences(userId, data);
     return updatedPreferences;

@@ -6,6 +6,8 @@ import cookieParser from 'cookie-parser'
 import { errorHandler } from './api/middleware/error.middleware'
 import authRoutes from './api/routes/auth.routes'
 import userRoutes from './api/routes/user.routes'
+import { startScheduler } from './pipeline/scheduler'
+import { startClaudeWorker } from './pipeline/queue/workers/claude.worker'
 const app = express();
 app.use(express.json());
 app.use(cookieParser())
@@ -25,7 +27,8 @@ const bootStrap = async () => {
         console.log("Server Start at PORT" + env.PORT);
     })
     // TODO: WebSocket server
-    // TODO: Pipeline scheduler
+    startScheduler()
+    startClaudeWorker();
 }
 
 process.on('unhandledRejection', (err) => {
